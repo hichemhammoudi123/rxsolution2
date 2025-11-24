@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pneu Express - Vente de Pneus Auto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-yellow': '#FFC107', // Jaune Éclatant
+                        'secondary-black': '#212121', // Noir Profond
+                        'text-white': '#FFFFFF',
+                        'bg-light': '#F9F9F9',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Styles pour le carrousel (animation simple) */
+        .slider-item {
+            display: none;
+            width: 100%;
+            height: 400px; /* Hauteur fixe pour le carrousel */
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            position: relative;
+        }
+        .slider-item.active {
+            display: block;
+            opacity: 1;
+        }
+        /* Style pour les boutons de pagination actifs */
+        .pagination-link.active {
+            background-color: #FFC107;
+            color: #212121;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-bg-light text-secondary-black">
+
+    <header class="bg-secondary-black shadow-md sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-20">
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 bg-primary-yellow rounded-full flex items-center justify-center">
+                    <span class="text-secondary-black font-extrabold text-xl">P</span>
+                </div>
+                <h1 class="text-primary-yellow text-3xl font-bold">RX SOLUTION</h1>
+            </div>
+            
+            <nav class="flex space-x-4 items-center">
+                <a href="#catalogue" class="text-text-white hover:text-primary-yellow transition duration-150 font-medium">Catalogue Auto</a>
+                <button id="view-cart-btn" class="bg-primary-yellow text-secondary-black font-semibold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-150 relative">
+                    Panier (<span id="cart-count">0</span>)
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <div id="image-slider" class="max-w-7xl mx-auto mt-6 overflow-hidden rounded-xl shadow-lg relative">
+        <div class="slider-item bg-cover bg-center active" style="background-image: url('https://pneuservice.dz/uploads/banners/covers/b5488f8e2eeeb0b7666b80b9b7c30ba0.jpg');">
+            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                <p class="text-text-white text-5xl font-extrabold p-4 border-4 border-primary-yellow">PNEUS AUTO</p>
+            </div>
+        </div>
+        <div class="slider-item bg-cover bg-center" style="background-image: url('https://pneuservice.dz/uploads/banners/covers/b5488f8e2eeeb0b7666b80b9b7c30ba0.jpg');"></div>
+        <div class="slider-item bg-cover bg-center" style="background-image: url('https://pneuservice.dz/uploads/banners/covers/b5488f8e2eeeb0b7666b80b9b7c30ba0.jpg');"></div>
+    </div>
+
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <h2 id="catalogue" class="text-4xl font-extrabold text-center text-secondary-black mb-10 border-b-4 border-primary-yellow pb-2">Catalogue Pneus Auto</h2>
+        
+        <div class="flex flex-wrap gap-4 mb-8 justify-center">
+            <select id="filter-family" class="p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-primary-yellow focus:border-primary-yellow">
+                <option value="all">Toutes les Familles</option>
+            </select>
+            <select id="filter-marque" class="p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-primary-yellow focus:border-primary-yellow">
+                <option value="all">Toutes les Marques</option>
+            </select>
+            <select id="filter-dimension" class="p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-primary-yellow focus:border-primary-yellow">
+                <option value="all">Toutes les Dimensions</option>
+            </select>
+            <button id="reset-filters" class="bg-secondary-black text-text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-150">Réinitialiser Filtres</button>
+        </div>
+
+        <div id="pneus-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            </div>
+
+        <div id="pagination-container" class="flex justify-center mt-10 space-x-2">
+            </div>
+
+    </main>
+
+    <div id="cart-modal" class="hidden fixed inset-0 bg-secondary-black bg-opacity-75 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white p-6 rounded-lg shadow-2xl w-full max-w-lg m-4">
+                <div class="flex justify-between items-center border-b pb-3 mb-4">
+                    <h3 class="text-2xl font-bold text-secondary-black">🛒 Votre Panier</h3>
+                    <button id="close-cart-btn" class="text-secondary-black hover:text-primary-yellow text-2xl font-semibold">×</button>
+                </div>
+                
+                <div id="cart-items" class="space-y-4">
+                    <p id="empty-cart-message" class="text-center text-gray-500">Votre panier est vide.</p>
+                </div>
+
+                <div id="cart-summary" class="mt-6 pt-4 border-t-2 border-primary-yellow">
+                    <div class="flex justify-between text-xl font-bold">
+                        <span>Total :</span>
+                        <span id="cart-total" class="text-primary-yellow">0 DA</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary-yellow text-secondary-black font-bold py-3 rounded-lg hover:bg-yellow-400 transition duration-150">
+                        Passer à la Caisse
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="bg-secondary-black text-text-white py-6 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 Pneu Express. Simulation de données. Design Tailwind.</p>
+        </div>
+    </footer>
+
+    <script>
+        $(document).ready(function() {
+            
+            // -----------------------------------------------------
+            // 1. DONNÉES ARTICLE (SIMULÉES)
+            // -----------------------------------------------------
+            const pneusData = [
+                { id: 1, nom: "Pilot Sport 4", marque: "Michelin", family: "Été", dimension: "225/45 R17 91Y", prix: 15500, image_url: "https://via.placeholder.com/400x300/FFC107/212121?text=Michelin+PS4", description: "Pneu été haute performance, excellent grip." },
+                { id: 2, nom: "ContiPremiumContact 6", marque: "Continental", family: "Été", dimension: "205/55 R16 91V", prix: 12200, image_url: "https://via.placeholder.com/400x300/FFC107/212121?text=Conti+CPC6", description: "Confortable et sécurisant, longue durée de vie." },
+                { id: 3, nom: "Cinturato P7", marque: "Pirelli", family: "Été", dimension: "195/65 R15 91H", prix: 9800, image_url: "https://via.placeholder.com/400x300/FFC107/212121?text=Pirelli+P7", description: "Économique et écologique, conçu pour les citadines." },
+                { id: 4, nom: "Turanza T005", marque: "Bridgestone", family: "Été", dimension: "215/60 R17 96H", prix: 14100, image_url: "https://via.placeholder.com/400x300/FFC107/212121?text=Bridgestone+T005", description: "Performance équilibrée pour les longs trajets." },
+                { id: 5, nom: "CrossClimate+", marque: "Michelin", family: "Toutes Saisons", dimension: "205/55 R16 91H", prix: 13000, image_url: "https://via.placeholder.com/400x300/212121/FFC107?text=CrossClimate%2B", description: "Sécurité toute l'année, été comme hiver." },
+                { id: 6, nom: "All Season", marque: "Goodyear", family: "Toutes Saisons", dimension: "185/65 R14 86T", prix: 9200, image_url: "https://via.placeholder.com/400x300/212121/FFC107?text=Goodyear+AS", description: "Excellent choix pour les climats modérés." },
+                { id: 7, nom: "Winterhawk 4", marque: "Firestone", family: "Hiver", dimension: "195/65 R15 91T", prix: 11000, image_url: "https://via.placeholder.com/400x300/FFC107/212121?text=Firestone+WH4", description: "Grip maximal sur neige et glace." },
+                { id: 8, nom: "Blizzak LM005", marque: "Bridgestone", family: "Hiver", dimension: "225/45 R17 91H", prix: 16000, image_url: "https://via.placeholder.com/400x300/FFC107/212121?text=Bridgestone+LM005", description: "Idéal pour les conditions hivernales extrêmes." },
+                { id: 9, nom: "Primacy 4", marque: "Michelin", family: "Été", dimension: "205/55 R16 91V", prix: 12800, image_url: "https://via.placeholder.com/400x300/212121/FFC107?text=Primacy+4", description: "Longévité et performance de freinage." },
+                { id: 10, nom: "EcoContact 6", marque: "Continental", family: "Été", dimension: "175/65 R14 82T", prix: 8500, image_url: "https://via.placeholder.com/400x300/212121/FFC107?text=Continental+Eco6", description: "Optimisé pour la consommation de carburant." }
+            ];
+
+            let cart = []; 
+            let currentPage = 1;
+            const itemsPerPage = 4; // Définir le nombre d'articles par page
+
+            // Fonction de formatage du prix
+            const formatPrice = (price) => {
+                return price.toLocaleString('fr-DZ', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' DA';
+            };
+
+            // -----------------------------------------------------
+            // 2. LOGIQUE DU CARROUSEL
+            // -----------------------------------------------------
+            let currentSlide = 0;
+            const $slides = $('.slider-item');
+            const totalSlides = $slides.length;
+
+            function showSlide(index) {
+                $slides.removeClass('active');
+                $slides.eq(index).addClass('active');
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            setInterval(nextSlide, 4000);
+
+            // -----------------------------------------------------
+            // 3. LOGIQUE DES FILTRES ET DU CATALOGUE
+            // -----------------------------------------------------
+            
+            // Remplit les sélecteurs de filtres avec les valeurs uniques
+            const populateFilters = () => {
+                const uniqueFamilies = [...new Set(pneusData.map(p => p.family))].sort();
+                const uniqueMarques = [...new Set(pneusData.map(p => p.marque))].sort();
+                const uniqueDimensions = [...new Set(pneusData.map(p => p.dimension))].sort();
+
+                const $familyFilter = $('#filter-family');
+                const $marqueFilter = $('#filter-marque');
+                const $dimensionFilter = $('#filter-dimension');
+
+                uniqueFamilies.forEach(family => {
+                    $familyFilter.append(`<option value="${family}">${family}</option>`);
+                });
+                
+                uniqueMarques.forEach(marque => {
+                    $marqueFilter.append(`<option value="${marque}">${marque}</option>`);
+                });
+
+                uniqueDimensions.forEach(dim => {
+                    $dimensionFilter.append(`<option value="${dim}">${dim}</option>`);
+                });
+            };
+
+            // Filtre les données du catalogue
+            const filterData = () => {
+                const selectedFamily = $('#filter-family').val();
+                const selectedMarque = $('#filter-marque').val();
+                const selectedDimension = $('#filter-dimension').val();
+
+                return pneusData.filter(pneu => {
+                    const matchesFamily = selectedFamily === 'all' || pneu.family === selectedFamily;
+                    const matchesMarque = selectedMarque === 'all' || pneu.marque === selectedMarque;
+                    const matchesDimension = selectedDimension === 'all' || pneu.dimension === selectedDimension;
+                    
+                    return matchesFamily && matchesMarque && matchesDimension;
+                });
+            };
+
+            // Génère et affiche les liens de pagination
+            const renderPagination = (totalItems) => {
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                const $paginationContainer = $('#pagination-container');
+                $paginationContainer.empty();
+
+                if (totalPages <= 1) return;
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const activeClass = i === currentPage ? 'active' : 'bg-white hover:bg-primary-yellow hover:bg-opacity-70';
+                    $paginationContainer.append(`
+                        <button class="pagination-link ${activeClass} text-secondary-black border border-gray-300 rounded-lg w-10 h-10 transition duration-150" data-page="${i}">
+                            ${i}
+                        </button>
+                    `);
+                }
+            };
+
+            // Affiche le catalogue (avec filtres et pagination appliqués)
+            const displayCatalogue = (page = 1) => {
+                currentPage = page;
+                const filteredPneus = filterData();
+                const totalItems = filteredPneus.length;
+
+                // Calcul des index pour la pagination
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const paginatedPneus = filteredPneus.slice(startIndex, endIndex);
+
+                const $container = $('#pneus-container');
+                $container.empty();
+
+                if (paginatedPneus.length === 0) {
+                    $container.append('<p class="col-span-full text-center text-xl text-gray-500 py-10">Aucun pneu ne correspond aux critères de filtre.</p>');
+                } else {
+                    paginatedPneus.forEach(pneu => {
+                        $container.append(createPneuCard(pneu));
+                    });
+                }
+                
+                renderPagination(totalItems);
+            };
+
+            // Fonction pour générer la carte HTML d'un pneu
+            const createPneuCard = (pneu) => {
+                return `
+                    <div class="p-5 bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition duration-300 flex flex-col justify-between">
+                        <img src="${pneu.image_url}" alt="${pneu.marque} ${pneu.nom}" class="w-full h-auto rounded-lg mb-4 object-cover">
+                        <div>
+                            <h3 class="text-xl font-bold text-secondary-black">${pneu.marque} - ${pneu.nom}</h3>
+                            <p class="text-gray-600 text-sm mt-1">Famille: <strong>${pneu.family}</strong></p>
+                            <p class="text-md font-semibold mt-2">Dim. : <span class="text-secondary-black">${pneu.dimension}</span></p>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center">
+                            <span class="text-2xl font-extrabold text-primary-yellow">${formatPrice(pneu.prix)}</span>
+                            <button data-id="${pneu.id}" class="add-to-cart-btn bg-secondary-black text-text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-150 text-sm">
+                                Ajouter au Panier
+                            </button>
+                        </div>
+                    </div>
+                `;
+            };
+            
+            // -----------------------------------------------------
+            // 4. LOGIQUE DU PANIER ET GESTIONNAIRES D'ÉVÉNEMENTS
+            // -----------------------------------------------------
+
+            const addToCart = (pneuId) => {
+                const pneu = pneusData.find(p => p.id == pneuId);
+                if (!pneu) return;
+
+                const existingItem = cart.find(item => item.id === pneu.id);
+                
+                if (existingItem) {
+                    existingItem.qty++;
+                } else {
+                    cart.push({
+                        id: pneu.id,
+                        nom: pneu.nom,
+                        marque: pneu.marque,
+                        prix: pneu.prix,
+                        qty: 1
+                    });
+                }
+                updateCartUI();
+            };
+
+            const updateCartUI = () => {
+                const $cartItems = $('#cart-items');
+                $cartItems.empty();
+                
+                let total = 0;
+                let itemCount = 0;
+
+                if (cart.length === 0) {
+                    $('#empty-cart-message').show();
+                    $('#cart-summary').hide();
+                } else {
+                    $('#empty-cart-message').hide();
+                    $('#cart-summary').show();
+
+                    cart.forEach(item => {
+                        const subTotal = item.prix * item.qty;
+                        total += subTotal;
+                        itemCount += item.qty;
+
+                        const itemHtml = `
+                            <div class="flex justify-between items-center py-2 border-b">
+                                <span class="font-medium">${item.marque} ${item.nom}</span>
+                                <div class="flex items-center space-x-2">
+                                    <button class="update-qty-btn bg-gray-200 text-secondary-black px-2 rounded" data-id="${item.id}" data-action="decrease">-</button>
+                                    <span>${item.qty}</span>
+                                    <button class="update-qty-btn bg-gray-200 text-secondary-black px-2 rounded" data-id="${item.id}" data-action="increase">+</button>
+                                    <span class="font-semibold w-24 text-right">${formatPrice(subTotal)}</span>
+                                </div>
+                            </div>
+                        `;
+                        $cartItems.append(itemHtml);
+                    });
+                }
+
+                $('#cart-total').text(formatPrice(total));
+                $('#cart-count').text(itemCount);
+            };
+
+            // Événements du catalogue et filtres
+            $(document).on('click', '.add-to-cart-btn', function() {
+                addToCart($(this).data('id'));
+            });
+
+            // Gérer les changements de filtre (Famille, Marque, Dimension)
+            $('#filter-family, #filter-marque, #filter-dimension').on('change', function() {
+                displayCatalogue(1); // Retourner à la première page après filtrage
+            });
+            
+            // Réinitialiser les filtres
+            $('#reset-filters').on('click', function() {
+                $('#filter-family').val('all');
+                $('#filter-marque').val('all'); 
+                $('#filter-dimension').val('all');
+                displayCatalogue(1);
+            });
+            
+            // Gérer le clic sur les boutons de pagination
+            $(document).on('click', '.pagination-link', function() {
+                const page = $(this).data('page');
+                displayCatalogue(page);
+                // Animer le défilement vers le haut du catalogue
+                $('html, body').animate({
+                    scrollTop: $('#catalogue').offset().top - 80
+                }, 300);
+            });
+            
+            // Événements du panier
+            $('#view-cart-btn').on('click', function() {
+                $('#cart-modal').removeClass('hidden').addClass('flex');
+            });
+
+            $('#close-cart-btn').on('click', function() {
+                $('#cart-modal').removeClass('flex').addClass('hidden');
+            });
+
+            $('#cart-modal').on('click', function(e) {
+                if ($(e.target).is('#cart-modal')) {
+                    $('#cart-modal').removeClass('flex').addClass('hidden');
+                }
+            });
+            
+            $(document).on('click', '.update-qty-btn', function() {
+                const pneuId = $(this).data('id');
+                const action = $(this).data('action');
+                const itemIndex = cart.findIndex(item => item.id == pneuId);
+
+                if (itemIndex > -1) {
+                    if (action === 'increase') {
+                        cart[itemIndex].qty++;
+                    } else if (action === 'decrease') {
+                        cart[itemIndex].qty--;
+                        if (cart[itemIndex].qty <= 0) {
+                            cart.splice(itemIndex, 1);
+                        }
+                    }
+                    updateCartUI();
+                }
+            });
+
+
+            // Initialisation au chargement de la page
+            populateFilters(); 
+            displayCatalogue(1); 
+            updateCartUI();
+        });
+    </script>
+
+</body>
+</html>
