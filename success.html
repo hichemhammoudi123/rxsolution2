@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande Envoyée - RX SOLUTION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-yellow': '#FFC107', 
+                        'secondary-black': '#212121', 
+                        'text-white': '#FFFFFF',
+                        'bg-light': '#F9F9F9',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-bg-light text-secondary-black min-h-screen flex items-center justify-center">
+
+    <div class="max-w-xl p-8 bg-white rounded-xl shadow-2xl text-center">
+        <div class="text-6xl text-primary-yellow mb-4">🎉</div>
+        <h1 class="text-3xl font-bold mb-3 text-secondary-black">Commande Envoyée avec Succès !</h1>
+        <p class="text-gray-600 mb-6">
+            Votre commande a été transmise à RX SOLUTION. 
+            Nous vous contacterons rapidement par téléphone ou par e-mail pour confirmer les détails.
+        </p>
+        <a href="/" class="bg-secondary-black text-text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-700 transition duration-150 inline-block">
+            Retourner au Catalogue
+        </a>
+    </div>
+
+</body>
+</html>
