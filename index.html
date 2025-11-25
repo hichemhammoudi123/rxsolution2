@@ -49,17 +49,24 @@
     <header class="bg-secondary-black shadow-md sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-20">
             <div class="flex items-center space-x-4">
-                <div class="w-10 h-10 bg-primary-yellow rounded-full flex items-center justify-center">
-                    <span class="text-secondary-black font-extrabold text-xl">R</span>
+                <div class="w-10 h-10 bg-primary-yellow rounded-full flex items-center justify-center p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-secondary-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 2v2"></path>
+                        <path d="M12 20v2"></path>
+                        <path d="M20 12h2"></path>
+                        <path d="M2 12h2"></path>
+                        <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
                 </div>
                 <h1 class="text-primary-yellow text-3xl font-bold">RX SOLUTION</h1>
             </div>
             
-            <nav class="flex space-x-4 items-center">
-                <a href="#catalogue" class="text-text-white hover:text-primary-yellow transition duration-150 font-medium">Catalogue Auto</a>
+            <nav class="flex items-center space-x-4 sm:flex-row-reverse sm:space-x-0 sm:space-x-reverse md:space-x-4 md:flex-row">
                 <button id="view-cart-btn" class="bg-primary-yellow text-secondary-black font-semibold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-150 relative">
                     Panier (<span id="cart-count">0</span>)
                 </button>
+                <a href="#catalogue" class="text-text-white hover:text-primary-yellow transition duration-150 font-medium py-2 px-2 md:py-0 md:px-0">Catalogue Auto</a>
             </nav>
         </div>
     </header>
@@ -67,7 +74,7 @@
     <div id="image-slider" class="max-w-7xl mx-auto mt-6 overflow-hidden rounded-xl shadow-lg relative">
         <div class="slider-item bg-cover bg-center active" style="background-image: url('https://pneuservice.dz/uploads/banners/covers/b5488f8e2eeeb0b7666b80b9b7c30ba0.jpg');">
             <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                <p class="text-text-white text-5xl font-extrabold p-4 border-4 border-primary-yellow">PNEUS AUTO</p>
+                <p class="text-text-white text-3xl sm:text-5xl font-extrabold p-4 border-4 border-primary-yellow">PNEUS AUTO</p>
             </div>
         </div>
         <div class="slider-item bg-cover bg-center" style="background-image: url('https://pneuservice.dz/uploads/banners/covers/b5488f8e2eeeb0b7666b80b9b7c30ba0.jpg');"></div>
@@ -79,16 +86,16 @@
         <h2 id="catalogue" class="text-4xl font-extrabold text-center text-secondary-black mb-10 border-b-4 border-primary-yellow pb-2">Catalogue Pneus Auto</h2>
         
         <div class="flex flex-wrap gap-4 mb-8 justify-center">
-            <select id="filter-family" class="p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-primary-yellow focus:border-primary-yellow">
+            <select id="filter-family" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-primary-yellow focus:border-primary-yellow">
                 <option value="all">Toutes les Familles</option>
             </select>
-            <select id="filter-marque" class="p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-primary-yellow focus:border-primary-yellow">
+            <select id="filter-marque" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-primary-yellow focus:border-primary-yellow">
                 <option value="all">Toutes les Marques</option>
             </select>
-            <select id="filter-dimension" class="p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-primary-yellow focus:border-primary-yellow">
+            <select id="filter-dimension" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-primary-yellow focus:border-primary-yellow">
                 <option value="all">Toutes les Dimensions</option>
             </select>
-            <button id="reset-filters" class="bg-secondary-black text-text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-150">Réinitialiser Filtres</button>
+            <button id="reset-filters" class="w-full sm:w-auto bg-secondary-black text-text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-150">Réinitialiser Filtres</button>
         </div>
 
         <div id="pneus-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -430,6 +437,20 @@
                     updateCartUI();
                 }
             });
+            
+            // * NOUVEAU: GESTION DE LA SOUMISSION DU FORMULAIRE (pour vider le panier après l'envoi)
+            $('#order-form').on('submit', function(e) {
+                // Cette fonction JS n'empêche pas l'envoi du formulaire par Netlify,
+                // elle est juste là pour simuler une mise à jour après l'envoi.
+                
+                // Netlify s'occupe de l'envoi et de la redirection grâce à `data-netlify="true"`
+                // et `action="/success.html"`.
+                
+                // Vider le panier après une soumission (simulée ici, la redirection effacera de toute façon)
+                cart = [];
+                updateCartUI(); 
+            });
+
 
             // Initialisation au chargement de la page
             populateFilters(); 
