@@ -178,7 +178,7 @@
 
             let cart = []; 
             let currentPage = 1;
-            const itemsPerPage = 4; // Définir le nombre d'articles par page
+            const itemsPerPage = 4; 
 
             // Fonction de formatage du prix (utilisé partout)
             const formatPrice = (price) => {
@@ -327,7 +327,8 @@
                         nom: pneu.nom,
                         marque: pneu.marque,
                         prix: pneu.prix,
-                        qty: 1
+                        qty: 1,
+                        dimension: pneu.dimension // Ajout de la dimension pour plus de clarté
                     });
                 }
                 updateCartUI();
@@ -338,26 +339,27 @@
                 const $cartItems = $('#cart-items');
                 $cartItems.empty();
                 
-                let totalNumeric = 0; // Variable pour le total en format nombre
+                let totalNumeric = 0; 
                 let itemCount = 0;
-                let cartDetailsForForm = ""; // Variable pour les champs cachés Netlify
+                let cartDetailsForForm = ""; // Correction ici pour une chaîne plus simple pour l'email
 
                 if (cart.length === 0) {
                     $('#empty-cart-message').show();
                     $('#cart-summary').hide();
-                    $('#contact-form-section').hide(); // Cacher le formulaire si le panier est vide
+                    $('#contact-form-section').hide(); 
                 } else {
                     $('#empty-cart-message').hide();
                     $('#cart-summary').show();
-                    $('#contact-form-section').show(); // Afficher le formulaire
+                    $('#contact-form-section').show(); 
 
-                    cart.forEach(item => {
+                    cart.forEach((item, index) => {
                         const subTotal = item.prix * item.qty;
-                        totalNumeric += subTotal; // Accumuler le total numérique
+                        totalNumeric += subTotal; 
                         itemCount += item.qty;
 
-                        // Construire la chaîne pour le champ caché
-                        cartDetailsForForm += `${item.qty}x ${item.marque} ${item.nom} (Prix Unitaire: ${formatPrice(item.prix)}) | `;
+                        // CORRECTION : Création d'une chaîne plus lisible et simple pour le champ caché
+                        // Utilisation d'un format simple et numéroté (Ligne 1: 2x Michelin Pilot Sport 4 - Dim: 225/45 R17)
+                        cartDetailsForForm += `Ligne ${index + 1}: ${item.qty}x ${item.marque} ${item.nom} - Dim: ${item.dimension || 'N/A'} (Total: ${formatPrice(subTotal)}) \n`;
                         
                         const itemHtml = `
                             <div class="flex justify-between items-center py-2 border-b">
@@ -375,8 +377,9 @@
                 }
                 
                 // Mettre à jour les champs cachés pour la soumission Netlify
-                $('#hidden-cart-details').val(cartDetailsForForm.trim());
-                // CORRECTION : Utiliser le formatPrice(totalNumeric) pour s'assurer que le montant est correctement affiché dans l'email
+                // NOTE : Les sauts de ligne (\n) peuvent ne pas s'afficher dans tous les clients de messagerie,
+                // mais le fait d'avoir une chaîne plus propre augmente les chances.
+                $('#hidden-cart-details').val(cartDetailsForForm.trim()); 
                 $('#hidden-cart-total-value').val(formatPrice(totalNumeric));
 
                 $('#cart-total').text(formatPrice(totalNumeric));
@@ -445,8 +448,10 @@
             
             // GESTION DE LA SOUMISSION DU FORMULAIRE (pour vider le panier après l'envoi)
             $('#order-form').on('submit', function(e) {
+                // S'assurer que les valeurs cachées sont à jour une dernière fois
+                updateCartUI(); 
+                // Vider le panier après la soumission
                 cart = [];
-                // Petit délai pour assurer que l'UI est mise à jour (panier vide) APRÈS la soumission
                 setTimeout(updateCartUI, 100);
             });
 
