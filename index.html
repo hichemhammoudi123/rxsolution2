@@ -48,21 +48,22 @@
 
     <header class="bg-secondary-black shadow-md sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-20">
-<div class="flex items-center space-x-2">
-    <a href="index.html" class="flex items-center space-x-2">
-        <div class="w-10 h-10 bg-primary-yellow rounded-full flex items-center justify-center p-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-secondary-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 2v2"></path>
-                <path d="M12 20v2"></path>
-                <path d="M20 12h2"></path>
-                <path d="M2 12h2"></path>
-                <circle cx="12" cy="12" r="2"></circle>
-            </svg>
-        </div>
-        <h1 class="text-primary-yellow text-xl sm:text-3xl font-bold">RX SOLUTION</h1>
-    </a>
-</div>
+            
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-primary-yellow rounded-full flex items-center justify-center p-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-secondary-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 2v2"></path>
+                            <path d="M12 20v2"></path>
+                            <path d="M20 12h2"></path>
+                            <path d="M2 12h2"></path>
+                            <circle cx="12" cy="12" r="2"></circle>
+                        </svg>
+                    </div>
+                    <h1 class="text-primary-yellow text-xl sm:text-3xl font-bold">RX SOLUTION</h1>
+                </a>
+            </div>
             
             <nav class="flex items-center space-x-2 sm:space-x-4 md:space-x-4">
                 <button id="view-cart-btn" class="bg-primary-yellow text-secondary-black font-semibold py-2 px-3 rounded-lg text-sm sm:text-base hover:bg-yellow-400 transition duration-150 relative">
@@ -337,7 +338,7 @@
                 const $cartItems = $('#cart-items');
                 $cartItems.empty();
                 
-                let total = 0;
+                let totalNumeric = 0; // Variable pour le total en format nombre
                 let itemCount = 0;
                 let cartDetailsForForm = ""; // Variable pour les champs cachés Netlify
 
@@ -352,7 +353,7 @@
 
                     cart.forEach(item => {
                         const subTotal = item.prix * item.qty;
-                        total += subTotal;
+                        totalNumeric += subTotal; // Accumuler le total numérique
                         itemCount += item.qty;
 
                         // Construire la chaîne pour le champ caché
@@ -375,9 +376,10 @@
                 
                 // Mettre à jour les champs cachés pour la soumission Netlify
                 $('#hidden-cart-details').val(cartDetailsForForm.trim());
-                $('#hidden-cart-total-value').val(formatPrice(total));
+                // CORRECTION : Utiliser le formatPrice(totalNumeric) pour s'assurer que le montant est correctement affiché dans l'email
+                $('#hidden-cart-total-value').val(formatPrice(totalNumeric));
 
-                $('#cart-total').text(formatPrice(total));
+                $('#cart-total').text(formatPrice(totalNumeric));
                 $('#cart-count').text(itemCount);
             };
 
@@ -444,7 +446,8 @@
             // GESTION DE LA SOUMISSION DU FORMULAIRE (pour vider le panier après l'envoi)
             $('#order-form').on('submit', function(e) {
                 cart = [];
-                updateCartUI(); 
+                // Petit délai pour assurer que l'UI est mise à jour (panier vide) APRÈS la soumission
+                setTimeout(updateCartUI, 100);
             });
 
 
