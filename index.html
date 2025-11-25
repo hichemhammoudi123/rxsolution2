@@ -48,7 +48,7 @@
 
     <header class="bg-secondary-black shadow-md sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-20">
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2">
                 <div class="w-10 h-10 bg-primary-yellow rounded-full flex items-center justify-center p-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-secondary-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -59,14 +59,14 @@
                         <circle cx="12" cy="12" r="2"></circle>
                     </svg>
                 </div>
-                <h1 class="text-primary-yellow text-3xl font-bold">RX SOLUTION</h1>
+                <h1 class="text-primary-yellow text-xl sm:text-3xl font-bold">RX SOLUTION</h1>
             </div>
             
-            <nav class="flex items-center space-x-4 sm:flex-row-reverse sm:space-x-0 sm:space-x-reverse md:space-x-4 md:flex-row">
-                <button id="view-cart-btn" class="bg-primary-yellow text-secondary-black font-semibold py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-150 relative">
+            <nav class="flex items-center space-x-2 sm:space-x-4 sm:flex-row-reverse sm:space-x-0 sm:space-x-reverse md:space-x-4 md:flex-row">
+                <button id="view-cart-btn" class="bg-primary-yellow text-secondary-black font-semibold py-2 px-3 rounded-lg text-sm sm:text-base hover:bg-yellow-400 transition duration-150 relative">
                     Panier (<span id="cart-count">0</span>)
                 </button>
-                <a href="#catalogue" class="text-text-white hover:text-primary-yellow transition duration-150 font-medium py-2 px-2 md:py-0 md:px-0">Catalogue Auto</a>
+                <a href="#catalogue" class="text-text-white text-sm md:text-base hover:text-primary-yellow transition duration-150 font-medium py-2 px-1 md:py-0 md:px-0">Catalogue Auto</a>
             </nav>
         </div>
     </header>
@@ -438,15 +438,8 @@
                 }
             });
             
-            // * NOUVEAU: GESTION DE LA SOUMISSION DU FORMULAIRE (pour vider le panier après l'envoi)
+            // GESTION DE LA SOUMISSION DU FORMULAIRE (pour vider le panier après l'envoi)
             $('#order-form').on('submit', function(e) {
-                // Cette fonction JS n'empêche pas l'envoi du formulaire par Netlify,
-                // elle est juste là pour simuler une mise à jour après l'envoi.
-                
-                // Netlify s'occupe de l'envoi et de la redirection grâce à `data-netlify="true"`
-                // et `action="/success.html"`.
-                
-                // Vider le panier après une soumission (simulée ici, la redirection effacera de toute façon)
                 cart = [];
                 updateCartUI(); 
             });
